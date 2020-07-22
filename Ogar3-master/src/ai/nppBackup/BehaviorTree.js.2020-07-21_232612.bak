@@ -46,8 +46,3 @@ const myTask = new Task({
     return SUCCESS
   }
 })
-
-// Run Tree:
-setInterval(function() {
-  bTree.step()
-}, 1000/60)

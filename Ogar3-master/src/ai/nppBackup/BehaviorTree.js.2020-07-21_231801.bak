@@ -1,0 +1,26 @@
+const { BehaviorTree, Sequence, Task, SUCCESS, FAILURE } = require('behaviortree')
+
+
+import { BehaviorTree } from 'behaviortree'
+var bTree = new BehaviorTree({
+  tree: mySelector,
+  blackboard: {}
+})
+
+// selector nodes
+import { Random } from 'behaviortree'
+const mySelector = new Random({
+  nodes: [
+    // here comes in a list of nodes (Tasks, Sequences or Priorities)
+    // as objects or as registered strings
+  ]
+})
+
+// sequence nodes
+import { Sequence } from 'behaviortree'
+const mySequence = new Sequence({
+  nodes: [
+    // here comes in a list of nodes (Tasks, Sequences or Priorities)
+    // as objects or as registered strings
+  ]
+})
