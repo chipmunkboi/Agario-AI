@@ -124,7 +124,6 @@ BTBot.prototype.update = function() { // Overrides the update function from play
     this.decide(cell);
 	
     this.nodeDestroyQueue = []; // Empty
-    
 }
 
 // Custom
