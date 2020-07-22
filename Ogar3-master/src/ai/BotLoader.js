@@ -1,5 +1,6 @@
 // Project imports
 var BotPlayer = require('./BotPlayer');
+var BTBot = require('./BTBot')
 var FakeSocket = require('./FakeSocket');
 var PacketHandler = require('../PacketHandler');
 
@@ -17,31 +18,44 @@ function BotLoader(gameServer,botAmount) {
 
 	for (var i = 0; i < botAmount; i++) {
 		var s = new FakeSocket();
-		s.playerTracker = new BotPlayer(gameServer, s);
-		s.packetHandler = new PacketHandler(gameServer, s);
-		
-		// Add to client list
-		gameServer.clients.push(s);
-		
-		// Add to world
-		s.packetHandler.setNickname(this.getName());
+		var num = Math.floor(i/2)
+		if (i % 2 == 0){
+			s.playerTracker = new BotPlayer(gameServer, s);
+			s.packetHandler = new PacketHandler(gameServer, s);
+			
+			// Add to client list
+			gameServer.clients.push(s);
+			
+			// Add to world
+			s.packetHandler.setNickname("Bot " + num.toString());
+		}
+		else{
+			s.playerTracker = new BTBot(gameServer, s);
+			s.packetHandler = new PacketHandler(gameServer, s);
+			
+			// Add to client list
+			gameServer.clients.push(s);
+			
+			// Add to world
+			s.packetHandler.setNickname("BTBot " + num.toString());
+		}
 	}
 }
 
 module.exports = BotLoader;
 
-BotLoader.prototype.getName = function() {
-	var name = "";
-	 strRandomizer=array1[Math.floor(Math.random()*array1.length)] + " " + array2[Math.floor(Math.random()*array2.length)] + " "
-	// Picks a random name for the bot
-	if (/*this.randomNames.length > 0*/ true) {
-		var index = Math.floor(Math.random() * this.randomNames.length);
-		//name = this.randomNames[index];
-		name = strRandomizer;
-		this.randomNames.splice(index,1);
-	} else {
-		name = "bot" + ++this.nameIndex;
-	}
+// BotLoader.prototype.getName = function() {
+// 	var name = "";
+// 	 strRandomizer=array1[Math.floor(Math.random()*array1.length)] + " " + array2[Math.floor(Math.random()*array2.length)] + " "
+// 	// Picks a random name for the bot
+// 	if (/*this.randomNames.length > 0*/ true) {
+// 		var index = Math.floor(Math.random() * this.randomNames.length);
+// 		//name = this.randomNames[index];
+// 		name = "bot " + strRandomizer;
+// 		this.randomNames.splice(index,1);
+// 	} else {
+// 		name = "bot" + ++this.nameIndex;
+// 	}
 	
-	return name;
-}
+// 	return name;
+// }

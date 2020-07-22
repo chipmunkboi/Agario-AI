@@ -194,7 +194,7 @@ PlayerTracker.prototype.calcViewBox = function() {
         if (this.spectatedPlayer) {
             // Get spectated player's location and calculate zoom amount
             var specZoom = 0.2
-            this.socket.sendPacket(new Packet.UpdatePosition(3000,3000,specZoom));
+            this.socket.sendPacket(new Packet.UpdatePosition(this.spectatedPlayer.centerPos.x,this.spectatedPlayer.centerPos.y,specZoom));
             return this.spectatedPlayer.visibleNodes;
         } else {
             return []; // Nothing

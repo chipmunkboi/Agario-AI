@@ -1,6 +1,6 @@
 var PlayerTracker = require('../PlayerTracker');
 
-function BotPlayer() {
+function BTBot() {
 	PlayerTracker.apply(this, Array.prototype.slice.call(arguments));
 	//this.color = gameServer.getRandomColor();
 	
@@ -13,13 +13,13 @@ function BotPlayer() {
 	this.target;
 }
 
-module.exports = BotPlayer;
-BotPlayer.prototype = new PlayerTracker();
+module.exports = BTBot;
+BTBot.prototype = new PlayerTracker();
 
 // Functions
 
 // Called in update here
-BotPlayer.prototype.getLowestCell = function() {
+BTBot.prototype.getLowestCell = function() {
 	// Gets the cell with the lowest mass
 	if (this.cells.length <= 0) {
 		return null; // Error!
@@ -37,14 +37,22 @@ BotPlayer.prototype.getLowestCell = function() {
 
 // Override
 
-BotPlayer.prototype.updateSightRange = function() { // For view distance
-    var range = 1000;
-    range += this.cells[0].getSize() * 2.5;
-	
-    this.sightRange = range;
+BTBot.prototype.updateSightRange = function() { // For view distance
+    var totalSize = 1.0;
+    var len = this.cells.length;
+    
+    for (var i = 0; i < len;i++) {
+    	
+        if (!this.cells[i]) {
+            continue;
+        }
+    	
+        totalSize += this.cells[i].getSize();
+    }
+    this.sightRange = 1024 / Math.pow(Math.min(64.0 / totalSize, 1), 0.4);
 }
 
-BotPlayer.prototype.update = function() { // Overrides the update function from player tracker
+BTBot.prototype.update = function() { // Overrides the update function from player tracker
     // Remove nodes from visible nodes if possible
     for (var i = 0; i < this.nodeDestroyQueue.length; i++) {
         var index = this.visibleNodes.indexOf(this.nodeDestroyQueue[i]);
@@ -119,7 +127,7 @@ BotPlayer.prototype.update = function() { // Overrides the update function from 
 
 // Custom
 
-BotPlayer.prototype.decide = function(cell) {
+BTBot.prototype.decide = function(cell) {
 	// Check for predators
 	if (this.predators.length <= 0) {
 		if (this.prey.length > 0) {
@@ -226,7 +234,7 @@ BotPlayer.prototype.decide = function(cell) {
 }
 
 // Finds the nearest cell in list
-BotPlayer.prototype.findNearest = function(cell,list) {
+BTBot.prototype.findNearest = function(cell,list) {
 	if (this.currentTarget) {
 		// Do not check for food if target already exists
 		return null;
@@ -247,13 +255,13 @@ BotPlayer.prototype.findNearest = function(cell,list) {
     return shortest;
 }
 
-BotPlayer.prototype.getRandom = function(list) {
+BTBot.prototype.getRandom = function(list) {
 	// Gets a random cell from the array
 	var n = Math.floor(Math.random() * list.length);
 	return list[n];
 }
 
-BotPlayer.prototype.getDist = function(cell,check) {
+BTBot.prototype.getDist = function(cell,check) {
     // Fastest distance - I have a crappy computer to test with :(
     var xd = (check.position.x - cell.position.x);
     xd = xd < 0 ? xd * -1 : xd; // Math.abs is slow
@@ -264,7 +272,7 @@ BotPlayer.prototype.getDist = function(cell,check) {
     return (xd + yd);	
 }
 
-BotPlayer.prototype.getAccDist = function(cell,check) {
+BTBot.prototype.getAccDist = function(cell,check) {
     // Accurate Distance
     var xs = check.position.x - cell.position.x;
     xs = xs * xs;
@@ -275,7 +283,7 @@ BotPlayer.prototype.getAccDist = function(cell,check) {
     return Math.sqrt( xs + ys );
 }
 
-BotPlayer.prototype.getFoodBox = function(x,y) {
+BTBot.prototype.getFoodBox = function(x,y) {
 	var list = [];
     var r = 200;
 		

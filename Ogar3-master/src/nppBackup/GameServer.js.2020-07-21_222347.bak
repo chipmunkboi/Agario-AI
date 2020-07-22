@@ -405,7 +405,7 @@ $(document).on('keyup', function(input) {
             <div id="settings" class="checkbox" style="display:none;">
                 <div class="form-group" id="mainform">
                     <div id="locationKnown"></div>
-                    <button id="spectateBtn" onclick="spectate(); return false;" 
+                    <button id="spectateBtn" onclick="spectate(); return false;" disabled
                             class="btn btn-warning btn-spectate btn-needs-server">Spectate
                     </button>
                     <br clear="both"/>
@@ -613,7 +613,7 @@ GameServer.prototype.removeNode = function(node) {
 GameServer.prototype.mainLoop = function() {
     // Timer
     var local = new Date();
-    this.tick += (local - this.time+40);
+    this.tick += (local - this.time);
     this.time = local;
 
     if (this.tick >= 50) {
