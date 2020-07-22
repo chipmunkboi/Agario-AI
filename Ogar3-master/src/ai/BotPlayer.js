@@ -52,9 +52,9 @@ BotPlayer.prototype.update = function() { // Overrides the update function from 
         }
     }
 	
-    // Respawn if bot is dead
+    // Exit if bot is dead
     if (this.cells.length <= 0) {
-        this.gameServer.spawnPlayer(this);
+        return;
     }
 
     // Update every 500 ms
