@@ -1,5 +1,5 @@
 var BotPlayer = require('../BotPlayer');
-
+var BTBot = require('../BTBot');
 const { BehaviorTree, Sequence, Task, SUCCESS, FAILURE } = require('behaviortree')
 const { BehaviorTree, Sequence, Task, SUCCESS, FAILURE, decorators: { AlwaysSucceedDecorator } } = require('behaviortree')
 
@@ -35,12 +35,12 @@ const myTask = new Task({
   // is called. It allows you to setup things before starting to run
   // Beware: if task is resumed after calling this.running(), start is not called.
   start: function(blackboard) { blackboard.isStarted = true; },
- 
+
   // (optional) this function is called directly after the run method
   // is completed with either this.success() or this.fail(). It allows you to clean up
   // things, after you run the task.
   end: function(blackboard) { blackboard.isStarted = false; },
- 
+
   // This is the meat of your task. The run method does everything you want it to do.
   run: function(blackboard) {
     return SUCCESS
