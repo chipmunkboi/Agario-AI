@@ -515,3 +515,5 @@ class Bot
     return true
   }
 }
+
+const Bot = new Bot() 
