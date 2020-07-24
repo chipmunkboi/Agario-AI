@@ -1,0 +1,107 @@
+import { BehaviorTree, Selector, Sequence, Task, SUCCESS, FAILURE } from 'behaviortree'
+
+BehaviorTree.register('flee', new Task({
+  run: function (Bot) {
+    Bot.flee()
+    return SUCCESS
+  }
+}))
+
+BehaviorTree.register('fight', new Task({
+  run: function (Bot) {
+    Bot.fight()
+    return SUCCESS
+  }
+}))
+
+BehaviorTree.register('feed', new Task({
+  run: function (Bot) {
+    Bot.feed()
+    return SUCCESS
+  }
+}))
+
+BehaviorTree.register('wander', new Task({
+  run: function (Bot) {
+    Bot.wander()
+    return SUCCESS
+  }
+}))
+
+const tree = new Selector(
+{
+  nodes: [
+    'flee',
+    new Task(
+    {
+      run: function (Bot) 
+      {
+          // case 1: see a larger massed enemy near
+          if (Bot.largeMass())
+          {
+              // case 1: predator is 2x>
+              if (Bot.largerMassX2())
+                Bot.flee()
+                return SUCCESS
+          } 
+          else 
+          {
+              return FAILURE
+          }
+      }
+    }),
+    'bark',
+    new Task({
+      run: function (Bot) {
+        if (Bot.standBesideATree()) 
+        {
+          Bot.liftALeg()
+          Bot.pee()
+          return SUCCESS
+        } else 
+        {
+          return FAILURE
+        }
+      }
+    }
+    )
+  ]
+}
+)
+
+// implement actions here
+class Bot {
+    // behaviors
+  flee () {
+    //
+  }
+
+  fight () {
+    //
+  }
+
+  feed () {
+    //
+  }
+  
+  wander () {
+    //
+  }
+  
+    // checkers for state
+  standBesideATree () {
+    return true
+  }
+}
+
+const Bot = new Bot() 
+
+const bTree = new BehaviorTree({
+  tree: tree,
+  blackboard: Bot
+})
+
+// The "game" loop:
+setInterval(function () {
+  bTree.step()
+}, 1000 / 60)

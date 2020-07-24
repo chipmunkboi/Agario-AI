@@ -1,0 +1,69 @@
+import { BehaviorTree, Sequence, Task, SUCCESS, FAILURE } from 'behaviortree'
+
+BehaviorTree.register('root', new sequence({
+  run: function (Bot) {
+    Bot.start()
+    return SUCCESS
+  }
+}))
+
+const tree = new Sequence({
+  nodes: [
+    'bark',
+    new Task({
+      run: function (dog) {
+        dog.randomlyWalk()
+        return SUCCESS
+      }
+    }),
+    'bark',
+    new Task({
+      run: function (dog) {
+        if (dog.standBesideATree()) {
+          dog.liftALeg()
+          dog.pee()
+          return SUCCESS
+        } else {
+          return FAILURE
+        }
+      }
+    })
+  ]
+})
+
+// implement actions here
+class Bot {
+    // behaviors
+  flee () {
+    //
+  }
+
+  fight () {
+    //
+  }
+
+  feed () {
+    //
+  }
+  
+  wander () {
+    //
+  }
+  
+    // checkers for state
+  standBesideATree () {
+    return true
+  }
+}
+
+const dog = new Dog() // the nasty details of a dog are omitted
+
+const bTree = new BehaviorTree({
+  tree: tree,
+  blackboard: dog
+})
+
+// The "game" loop:
+setInterval(function () {
+  bTree.step()
+}, 1000 / 60)
