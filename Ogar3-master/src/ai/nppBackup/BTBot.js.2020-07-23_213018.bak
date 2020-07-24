@@ -144,15 +144,6 @@ BTBot.prototype.decide = function(cell) {
 		this.gameState = 2;
 	}
     
-    const bTreeTest = new BehaviorTree({
-        tree: treeTest,
-        blackboard: Bot
-        })
-
-    // The "game" loop:
-    setInterval(function () {
-      bTreeTest.step()
-    }, 1000 / 60)
     
 	/*
     switch (this.gameState) {

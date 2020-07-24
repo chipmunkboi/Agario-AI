@@ -143,18 +143,7 @@ BTBot.prototype.decide = function(cell) {
 		// Run
 		this.gameState = 2;
 	}
-    
-    const bTreeTest = new BehaviorTree({
-        tree: treeTest,
-        blackboard: Bot
-        })
-
-    // The "game" loop:
-    setInterval(function () {
-      bTreeTest.step()
-    }, 1000 / 60)
-    
-	/*
+	
     switch (this.gameState) {
         case 0: // Wander
             //console.log("[Bot] "+cell.getName()+": Wandering");
@@ -244,7 +233,6 @@ BTBot.prototype.decide = function(cell) {
             this.gameState = 0;
             break;
     }
-    */
 }
 
 // Finds the nearest cell in list
