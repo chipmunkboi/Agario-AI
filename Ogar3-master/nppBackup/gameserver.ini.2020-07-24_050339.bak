@@ -27,8 +27,8 @@ foodStartAmount = 100
 foodMaxAmount = 500
 foodMass = 1
 foodMaxMass = 4
-virusMinAmount = 0
-virusMaxAmount = 0
+virusMinAmount = 10
+virusMaxAmount = 50
 virusStartMass = 100
 virusBurstMass = 198
 // [Ejected Mass]

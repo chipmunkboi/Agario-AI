@@ -58,10 +58,10 @@ BTBot.prototype.update = function() { // Overrides the update function from play
         return;
     }
 
-    // Update every 500 ms
+    // Update every 100 ms
     if (this.tickViewBox <= 0) {
         this.visibleNodes = this.calcViewBox();
-        this.tickViewBox = 10;
+        this.tickViewBox = 2;
     } else {
         this.tickViewBox--;
         return;
@@ -182,7 +182,88 @@ BTBot.prototype.decide = function(cell) {
             // Direction to move
             var x1 = cell.position.x + (500 * Math.sin(angle));
             var y1 = cell.position.y + (500 * Math.cos(angle));
-			
+            
+
+
+
+            // Edge cases for movement
+            // stop AI from getting stuck in corners or edges
+            
+            //top side (top right corner to before top left)
+            if (cell.position.y > 3700 || cell.position.x > 300)
+            {
+                x1 = 0;
+                y1 = cell.position.y - 500;
+            }
+            //left side ( top left to before bottom left)
+            else if (cell.position.y > 300 || cell.position.x < 300)
+            {
+                x1 = cell.position.x + 400;
+                y1 = 0;
+            }
+            //bottom side (bottom left to before bottom right)
+            else if (cell.position.y > 300 || cell.position.x < 3700)
+            {
+                x1 = 8000;
+                y1 = cell.position.y + 500;
+            }
+            //right side (bottom right to before top right)
+            else if (cell.position.y < 3700 || cell.position.x > 3700)
+            {
+                x1 = cell.position.x - 400;
+                y1 = 4000;
+            }
+            // case 1: top right corner
+            /*
+            if (cell.position.x > 7500 && cell.position.y > 3500)
+            {
+                // move left
+                // if zero, move left
+                this.x1 = this.target.position.x - 1500; 
+                this.y1 = cell.positionY; 
+                }
+            else if (cell.position.x > 7500 && cell.position.y < 500){
+                // move left
+                this.x1 = this.target.position.x - 1500; 
+                this.y1 = cell.positionY; 
+            }
+            // case 2: top left corner
+            else if (cell.position.x < 500)
+            {
+                if (cell.position.y > 3500){
+                    // move right or move down
+                }
+                if (cell.position.y < 500){
+                    // move right or move up
+                }
+            }
+            // case 3: bottom left corner
+            else if (cell.position.x < 500 && cell.position.y < 500)
+            {
+                    this.mouseX = this.target.position.x - 1500; 
+                    this.mouseY = cell.positionY; 
+            }
+            // case 4: bottom right corner
+            else if (cell.position.x < 7500 && cell.position.y < 500)
+            {
+
+            }
+            // case 5: sideways
+            if (cell.position.y > 3500 || cell.position.y < 500)
+            {
+                    this.y1 = cell.position.y; 
+                    this.x1 = cell.position.x + 1500; 
+
+            }
+            // case 6: sides
+            else if (cell.position.x > 7500 || cell.position.x < 500)
+            {
+                // move vertically
+                // move u
+                y1 = this.target.position.y + 1500; 
+                x1 = cell.position.x;
+            }
+*/
             if ((!this.target) || (this.target.getType() == 0) || (this.visibleNodes.indexOf(this.target) == -1)) {
                 var foods = this.getFoodBox(x1,y1);
                 if (foods) {
@@ -197,8 +278,9 @@ BTBot.prototype.decide = function(cell) {
             this.mouse = {x: x1, y: y1};
             break;
         case 3: // Target prey
-            if ((!this.target) || (this.visibleNodes.indexOf(this.target) == -1)) {
-                this.target = this.getRandom(this.prey);
+            // changed to favor closest prey rather than random prey
+            if (this.visibleNodes.indexOf(this.target) == -1){
+                this.target = this.findNearest(cell, this.prey);
             }
             //console.log("[Bot] "+cell.getName()+": Targeting "+this.target.getName());
 							
@@ -246,10 +328,10 @@ BTBot.prototype.findNearest = function(cell,list) {
     return shortest;
 }
 
-BTBot.prototype.getRandom = function(list) {
+BTBot.prototype.getRandom = function(cell, list) {
 	// Gets a random cell from the array
-	var n = Math.floor(Math.random() * list.length);
-	return list[n];
+    var n = Math.floor(Math.random() * list.length);
+    return list[n];
 }
 
 BTBot.prototype.getDist = function(cell,check) {
