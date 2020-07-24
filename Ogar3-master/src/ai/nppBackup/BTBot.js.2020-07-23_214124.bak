@@ -1,6 +1,6 @@
-var PlayerTracker = require('../PlayerTracker');
+import { BehaviorTree, Selector, Sequence, Task, SUCCESS, FAILURE } from 'behaviortree'
 
-const { BehaviorTree, Sequence, Selector, Task, SUCCESS, FAILURE } = require('behaviortree')
+var PlayerTracker = require('../PlayerTracker');
 
 function BTBot() {
 	PlayerTracker.apply(this, Array.prototype.slice.call(arguments));
@@ -147,7 +147,7 @@ BTBot.prototype.decide = function(cell) {
 	}
     
     const bTreeTest = new BehaviorTree({
-        tree: tree,
+        tree: treeTest,
         blackboard: Bot
         })
 

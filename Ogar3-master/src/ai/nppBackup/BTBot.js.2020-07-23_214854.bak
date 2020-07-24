@@ -147,7 +147,7 @@ BTBot.prototype.decide = function(cell) {
 	}
     
     const bTreeTest = new BehaviorTree({
-        tree: tree,
+        tree: treeTest,
         blackboard: Bot
         })
 

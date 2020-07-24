@@ -31,7 +31,7 @@ BehaviorTree.register('wander', new Task({
   }
 }))
 
-const tree = new Selector(
+const treeTest = new Selector(
 {
       nodes: [
         // flee selector
@@ -71,7 +71,7 @@ const tree = new Selector(
         }
     )
     ]
-})
+}
 
 // implement actions here
 class Bot 

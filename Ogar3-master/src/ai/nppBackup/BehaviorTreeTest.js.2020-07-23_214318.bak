@@ -1,7 +1,6 @@
 var BTBot = require('../BTBot');
 
-const { BehaviorTree, Sequence, Selector, Task, SUCCESS, FAILURE } = require('behaviortree')
-
+const { BehaviorTree, Selector, Sequence, Task, SUCCESS, FAILURE } from 'behaviortree'
 
 BehaviorTree.register('flee', new Task({
   run: function (Bot) {
@@ -31,7 +30,7 @@ BehaviorTree.register('wander', new Task({
   }
 }))
 
-const tree = new Selector(
+const treeTest = new Selector(
 {
       nodes: [
         // flee selector
@@ -71,7 +70,7 @@ const tree = new Selector(
         }
     )
     ]
-})
+}
 
 // implement actions here
 class Bot 

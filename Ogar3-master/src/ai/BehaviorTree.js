@@ -1,6 +1,6 @@
 var BTBot = require('../BTBot');
 
-import { BehaviorTree, Selector, Sequence, Task, SUCCESS, FAILURE } from 'behaviortree'
+//var BehaviorTree = require('../BehaviorTreeTest');
 
 BehaviorTree.register('flee', new Task({
   run: function (Bot) {

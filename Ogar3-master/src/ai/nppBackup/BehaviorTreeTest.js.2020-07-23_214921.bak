@@ -71,7 +71,7 @@ const tree = new Selector(
         }
     )
     ]
-})
+}
 
 // implement actions here
 class Bot 
