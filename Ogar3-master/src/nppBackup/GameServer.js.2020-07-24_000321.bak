@@ -613,7 +613,7 @@ GameServer.prototype.removeNode = function(node) {
 GameServer.prototype.mainLoop = function() {
     // Timer
     var local = new Date();
-    this.tick += (local - this.time+0);
+    this.tick += (local - this.time+40);
     this.time = local;
 
     if (this.tick >= 50) {

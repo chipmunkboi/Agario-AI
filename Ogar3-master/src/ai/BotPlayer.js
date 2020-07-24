@@ -110,7 +110,6 @@ BotPlayer.prototype.update = function() { // Overrides the update function from 
             }
         }
     }
-	
     // Action
     this.decide(cell);
 	
@@ -133,7 +132,7 @@ BotPlayer.prototype.decide = function(cell) {
 		// Run
 		this.gameState = 2;
 	}
-	
+	// console.log("Gamestate of BotPlayer is " + this.gameState);
     switch (this.gameState) {
         case 0: // Wander
             //console.log("[Bot] "+cell.getName()+": Wandering");
