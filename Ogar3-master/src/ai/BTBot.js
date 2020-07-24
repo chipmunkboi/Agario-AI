@@ -18,190 +18,6 @@ function BTBot() {
 module.exports = BTBot;
 BTBot.prototype = new PlayerTracker();
 
-BTBot.flee = function(){
-    var avoid = this.predators[0];
-    //console.log("[Bot] "+cell.getName()+": Fleeing from "+avoid.getName());
-
-    // Find angle of vector between cell and predator
-    var deltaY = avoid.position.y - cell.position.y;
-    var deltaX = avoid.position.x - cell.position.x;
-    var angle = Math.atan2(deltaX,deltaY);
-
-    // Now reverse the angle
-    if (angle > Math.PI) {
-        angle -= Math.PI;
-    } else {
-        angle += Math.PI;
-    }
-
-    // Direction to move
-    var x1 = cell.position.x + (500 * Math.sin(angle));
-    var y1 = cell.position.y + (500 * Math.cos(angle));
-
-    if ((!this.target) || (this.target.getType() == 0) || (this.visibleNodes.indexOf(this.target) == -1)) {
-        var foods = this.getFoodBox(x1,y1);
-        if (foods) {
-            this.target = this.findNearest(cell, this.food);
-    
-            this.mouseX = this.target.position.x;
-            this.mouseY = this.target.position.y;
-        }
-    }   
-
-    this.mouse = {x: x1, y: y1};
-}
-
-BTBot.fight = function(){
-    if ((!this.target) || (this.visibleNodes.indexOf(this.target) == -1)) {
-        this.target = this.getRandom(this.prey);
-    }
-    //console.log("[Bot] "+cell.getName()+": Targeting "+this.target.getName());
-                
-    this.mouse = {x: this.target.position.x, y: this.target.position.y};
-
-    var massReq = 1.25 * (this.target.mass * 2 ); // Mass required to splitkill the target
-
-    if ((cell.mass > massReq) && (this.cells.length <= 2)) { // Will not split into more than 4 cells
-        var splitDist = (4 * (40 + (cell.getSpeed() * 4))) + (cell.getSize() * 1.75); // Distance needed to splitkill
-        var distToTarget = this.getAccDist(cell,this.target); // Distance between the target and this cell
-        // splitting condition
-        if (splitDist >= distToTarget) {
-        // Splitkill
-            console.log('[Bot] ' + cell.getName() + " has splitted")
-            this.gameServer.splitCells(this);
-        }
-    }
-}
-
-BTBot.feed = function(){
-    if ((!this.target) || (this.target.getType() == 0) || (this.visibleNodes.indexOf(this.target) == -1)) {
-        // Food is eaten/a player cell/out of sight... so find a new food cell to target
-        this.target = this.findNearest(cell,this.food);
-                
-        this.mouse = {x: this.target.position.x, y: this.target.position.y};
-    }
-}
-
-BTBot.wander = function(){
-    if ((cell.position.x == this.mouseX) && (cell.position.y == this.mouseY)) {
-        // Get a new position
-        var index = Math.floor(Math.random() * this.gameServer.nodes.length);
-        var randomNode = this.gameServer.nodes[index];
-        var pos = {x: 0, y: 0};
-
-        if (randomNode.getType() == 3 | 1) {
-            pos.x = randomNode.position.x;
-            pos.y = randomNode.position.y;
-        } else {
-            // Not a food/ejected cell
-            pos = this.gameServer.getRandomPosition();
-        }
-
-        // Set bot's mouse coords to this location
-        this.mouse = {x: pos.x, y: pos.y};
-    }
-
-// Behavior Tree
-BehaviorTree.register('flee', new Task({
-    run: function (BTBot) {
-        BTBot.flee()
-        return SUCCESS
-    }
-}))
-
-BehaviorTree.register('fight', new Task({
-    run: function (BTBot) {
-        BTBot.fight()
-        return SUCCESS
-    }
-}))
-
-BehaviorTree.register('feed', new Task({
-    run: function (BTBot) {
-        BTBot.feed()
-        return SUCCESS
-    }
-}))
-
-BehaviorTree.register('wander', new Task({
-    run: function (BTBot) {
-        BTBot.wander()
-        return SUCCESS
-    }
-}))
-
-const tree = new Selector({
-    nodes: [
-        'flee',
-        // flee
-        new Task({
-            run: function(BTBot) {
-                if (this.gameState == 2) { 
-                    // flee will call the above function and return success
-                    //'flee'
-                    console.log('[Bot] ' + cell.getName() + " has fled")
-                    //behavior_bot.flee()
-                    return SUCCESS
-                } else {
-                    console.log("return false")
-                    return FAILURE
-                }
-            }
-        }),
-        
-        // fight
-        new Task({
-            run: function(BTBot) {
-                if (this.gameState == 3) { 
-                    // fight will call the above function and return success
-                    //'fight'
-                    console.log('[Bot] ' + cell.getName() + " has fought")
-
-                        //case 1: SPLIT - smaller enemy, split towards to catch and consume
-                        
-                        //case 2: NO SPLIT - chase enemy, follow until consumed or gets too 
-                        BTBot.fight()
-                    return SUCCESS
-                    
-                } else {
-                    return FAILURE
-                }
-            }
-        }),
-        
-        // feed
-        new Task({
-            run: function(BTBot) {
-                if (this.gameState == 1) { 
-                    // feed will call the above function and return success
-                    //'feed'
-                    console.log('[Bot] ' + cell.getName() + " has fed")
-                    BTBot.feed()
-                    return SUCCESS
-                } else {
-                    return FAILURE
-                }
-            }
-        }),
-        
-        // wander - default
-        new Task({
-            run: function(BTBot) {
-                if (this.gameState == 0) { 
-                    // flee will call the above function and return success
-                    // 'wander'
-                    console.log('[Bot] ' + cell.getName() + " has wandered")
-                    BTBot.wander()
-                    return SUCCESS
-                } else {
-                    return FAILURE
-                }
-            }
-        })
-        
-    ]
-})
-
 // Functions
 
 // Called in update here
@@ -313,6 +129,57 @@ BTBot.prototype.update = function() { // Overrides the update function from play
     
 }
 
+// class
+class Dog{
+    bark(){
+        console.log("Bark!")
+    }
+    randomlyWalk(){
+        console.log("Random Walk!")
+    }
+    standBesideATree(){
+        console.log("Stand!")
+    }
+    liftALeg(){
+        console.log("Lift!")
+    }
+    pee(){
+        console.log("Pee!")
+    }
+}
+
+// Behavior Tree
+BehaviorTree.register('bark', new Task({
+    run: function(dog) {
+      dog.bark()
+      return SUCCESS
+    }
+  }))
+   
+  const tree = new Sequence({
+    nodes: [
+      'bark',
+      new Task({
+        run: function(dog) {
+          dog.randomlyWalk()
+          return SUCCESS
+        }
+      }),
+      'bark',
+      new Task({
+        run: function(dog) {
+          if (dog.standBesideATree()) {
+            dog.liftALeg()
+            dog.pee()
+            return SUCCESS
+          } else {
+            return FAILURE
+          }
+        }
+      })
+    ]
+  })
+
 BTBot.prototype.decide = function(cell) {
 	// Check for predators
 	if (this.predators.length <= 0) {
@@ -331,15 +198,21 @@ BTBot.prototype.decide = function(cell) {
     //const intitalbot = new BehaviorBot()
     //const behavior_bot = Object.assign(cell, intitalbot)
 
+    const dog = new Dog(/*...*/) // the nasty details of a dog are omitted
+ 
     const bTree = new BehaviorTree({
-        tree: tree,
-        blackboard: BTBot
+    tree: tree,
+    blackboard: dog
     })
-    console.log("_____________________________________________")
+ 
     // The "game" loop:
-    bTree.step({ debug: true });
+    setInterval(function() {
+    console.log("_____________________________________________")
+    bTree.step({ debug: true })
     console.log(bTree.lastRunData)
-    console.log("_____________________________________________\n")
+    console.log("_____________________________________________")
+    }, 1000/60)
+
 }
 // Finds the nearest cell in list
 BTBot.prototype.findNearest = function(cell,list) {
@@ -422,5 +295,4 @@ BTBot.prototype.getFoodBox = function(x,y) {
 		list.push(check);
     }
 }   
-}
 // Custom
