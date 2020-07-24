@@ -30,94 +30,93 @@ BehaviorTree.register('wander', new Task({
 
 const tree = new Selector(
 {
-      nodes: [
-        // flee selector
-        new Selector(
+    nodes: [
+      // flee selector
+      new Selector(
+      {
+        run: function (Bot) 
         {
-          run: function (Bot) 
+          // case 1: see a larger massed enemy near
+          if (Bot.largeMassNear())
           {
-              // case 1: see a larger massed enemy near
-              if (Bot.largeMassNear())
-              {
-                  // case 1.1: predator is less than twice the size of us
-                  if (Bot.largerMassNearX2())
-                  {
-                      Bot.move()
-                      return SUCCESS
-                  }
-                  // case 1.2: predator is greater than twice the size of us
-                  /*
-                  else
-                  {
-                    Bot.split()
-                    return SUCCESS
-                  }
-                  */
-              } 
-              else 
-              {
-                  return FAILURE
-              }
-          }
-        }
-        ),
-        // fight sequence
-        new Selector({
-          run: function (Bot) {
-            // case 2: see a smaller massed enemy
-            if (Bot.smallMassNear()) 
+            // case 1.1: predator is less than twice the size of us
+            if (Bot.largerMassNearX2())
             {
-                // case 2.1: enemy mass is 1/4 < x < 1/2 our mass
-                /*if (Bot.smallMassNearSplitDecide())
-                {
-                    Bot.splitAttack()
-                    return SUCCESS
-                }
-                // case 2.2: enemy is 1/2 < x < 1 our mass
-                else
-                { */
-                    Bot.chase()
-                    return SUCCESS
-               // }
-            } 
-            else 
-            {
-              return FAILURE
+              Bot.move()
+              return SUCCESS
             }
+            // case 1.2: predator is greater than twice the size of us
+            /*
+            else
+            {
+              Bot.split()
+              return SUCCESS
+            }
+            */
+          } 
+          else 
+          {
+            return FAILURE
           }
         }
-        // feed selector
-        new Selector(
+      }
+      ),
+      // fight sequence
+      new Selector(
+      {
+        run: function (Bot) {
+        // case 2: see a smaller massed enemy
+        if (Bot.smallMassNear()) 
         {
-          run: function (Bot) 
+          // case 2.1: enemy mass is 1/4 < x < 1/2 our mass
+          /*if (Bot.smallMassNearSplitDecide())
+            {
+              Bot.splitAttack()
+              return SUCCESS
+            }
+            // case 2.2: enemy is 1/2 < x < 1 our mass
+            else
+            { */
+              Bot.chase()
+              return SUCCESS
+            // }
+          } 
+          else 
           {
-              // case 3: see food
-              if (Bot.foodInRange())
-              }
-                    Bot.feed()
-                    return SUCCESS
-              } 
-              else 
-              {
-                  return FAILURE
-              }
+            return FAILURE
           }
         }
-        ),
-        // wander - default if all else fails
-        new Selector(
+      }
+      ),
+      // feed selector
+      new Selector(
+      {
+        run: function (Bot) 
         {
-          run: function (Bot) 
+          // case 3: see food
+          if (Bot.foodInRange())
           {
-                    Bot.move()
-                    return SUCCESS
-              } 
-
+            Bot.feed()
+            return SUCCESS
+          } 
+          else 
+          {
+            return FAILURE
           }
-       
-          )
-        )
-      ]
+        }
+      }
+      ),
+      // wander - default if all else fails
+      new Selector(
+      {
+        run: function (Bot) 
+        {
+          Bot.move()
+          return SUCCESS
+        } 
+      }
+      )
+    ]
 }
 )
 
