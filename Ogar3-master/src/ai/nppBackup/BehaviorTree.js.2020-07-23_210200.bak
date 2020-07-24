@@ -1,0 +1,175 @@
+var BTBot = require('../BTBot');
+
+import { BehaviorTree, Selector, Sequence, Task, SUCCESS, FAILURE } from 'behaviortree'
+
+BehaviorTree.register('flee', new Task({
+  run: function (Bot) {
+    Bot.flee()
+    return SUCCESS
+  }
+}))
+
+BehaviorTree.register('fight', new Task({
+  run: function (Bot) {
+    Bot.fight()
+    return SUCCESS
+  }
+}))
+
+BehaviorTree.register('feed', new Task({
+  run: function (Bot) {
+    Bot.feed()
+    return SUCCESS
+  }
+}))
+
+BehaviorTree.register('wander', new Task({
+  run: function (Bot) {
+    Bot.wander()
+    return SUCCESS
+  }
+}))
+
+const tree = new Selector(
+{
+      nodes: [
+        // flee selector
+        new Selector(
+        {
+          run: function (Bot) 
+          {
+              // case 1: see a larger massed enemy near
+              if (Bot.largeMassNear())
+              {
+                  // case 1.1: predator is less than twice the size of us
+                  if (Bot.largerMassNearX2())
+                  {
+                      Bot.move()
+                      return SUCCESS
+                  }
+                  // case 1.2: predator is greater than twice the size of us
+                  /*
+                  else
+                  {
+                    Bot.split()
+                    return SUCCESS
+                  }
+                  */
+              } 
+              else 
+              {
+                  return FAILURE
+              }
+          }
+        }
+        ),
+        // fight sequence
+        new Selector({
+          run: function (Bot) {
+            // case 2: see a smaller massed enemy
+            if (Bot.smallMassNear()) 
+            {
+                // case 2.1: enemy mass is 1/4 < x < 1/2 our mass
+                /*if (Bot.smallMassNearSplitDecide())
+                {
+                    Bot.splitAttack()
+                    return SUCCESS
+                }
+                // case 2.2: enemy is 1/2 x < 1 our mass
+                else
+                { */
+                    Bot.chase()
+                    return SUCCESS
+               // }
+            } 
+            else 
+            {
+              return FAILURE
+            }
+          }
+        }
+        // feed selector
+        new Selector(
+        {
+          run: function (Bot) 
+          {
+              // case 3: see food
+              if (Bot.foodInRange())
+              }
+                    Bot.feed()
+                    return SUCCESS
+              } 
+              else 
+              {
+                  return FAILURE
+              }
+          }
+        }
+        ),
+        // wander - default if all else fails
+        new Selector(
+        {
+          run: function (Bot) 
+          {
+                    Bot.move()
+                    return SUCCESS
+              } 
+
+          }
+       
+          )
+        )
+      ]
+}
+)
+
+// implement actions here
+class Bot 
+{
+  // actions
+  flee () 
+  {
+    //
+  }
+
+  fight () 
+  {
+    //
+  }
+
+  feed () 
+  {
+    //
+  }
+  
+  wander () 
+  {
+    //
+  }
+  
+  aggressiveSplit()
+  {
+  }
+  
+  defensiveSplit()
+  {
+  }
+  
+  // checkers
+  standBesideATree()
+  {
+    return true
+  }
+}
+
+const Bot = new Bot() 
+
+const bTree = new BehaviorTree({
+  tree: tree,
+  blackboard: Bot
+})
+
+// The "game" loop:
+setInterval(function () {
+  bTree.step()
+}, 1000 / 60)

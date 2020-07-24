@@ -79,7 +79,7 @@ const tree = new Selector(
                 // case 2.2: enemy is 1/2 x < 1 our mass
                 else
                 { */
-                    Bot.fight()
+                    Bot.chase()
                     return SUCCESS
                // }
             } 

@@ -79,7 +79,7 @@ const tree = new Selector(
                 // case 2.2: enemy is 1/2 x < 1 our mass
                 else
                 { */
-                    Bot.fight()
+                    Bot.chase()
                     return SUCCESS
                // }
             } 
@@ -91,6 +91,7 @@ const tree = new Selector(
         }),
         // feed selector
         new Selector(
+        {
           run: function (Bot) 
           {
               // case 3: see food
@@ -116,9 +117,9 @@ const tree = new Selector(
         }
        
         )
-    )
-    ]
-}
+)
+]
+
 
 // implement actions here
 class Bot 

@@ -64,8 +64,7 @@ const tree = new Selector(
         }
         ),
         // fight sequence
-        new Selector(
-        {
+        new Selector({
           run: function (Bot) {
             // case 2: see a smaller massed enemy
             if (Bot.smallMassNear()) 
@@ -79,7 +78,7 @@ const tree = new Selector(
                 // case 2.2: enemy is 1/2 x < 1 our mass
                 else
                 { */
-                    Bot.fight()
+                    Bot.chase()
                     return SUCCESS
                // }
             } 
@@ -88,14 +87,15 @@ const tree = new Selector(
               return FAILURE
             }
           }
-        }),
+        }
         // feed selector
         new Selector(
+        {
           run: function (Bot) 
           {
               // case 3: see food
               if (Bot.foodInRange())
-              {
+              }
                     Bot.feed()
                     return SUCCESS
               } 
@@ -104,21 +104,24 @@ const tree = new Selector(
                   return FAILURE
               }
           }
+        }
         ),
         // wander - default if all else fails
         new Selector(
         {
           run: function (Bot) 
           {
-            Bot.wander()
-            return SUCCESS
-          } 
-        }
+                    Bot.move()
+                    return SUCCESS
+              } 
+
+          }
        
+          )
         )
-    )
-    ]
+      ]
 }
+)
 
 // implement actions here
 class Bot 
@@ -163,60 +166,34 @@ class Bot
   {
     if ((!this.target) || (this.visibleNodes.indexOf(this.target) == -1)) 
     {
-        this.target = this.getRandom(this.prey);
-    }
-    //console.log("[Bot] "+cell.getName()+": Targeting "+this.target.getName());
-                    
-    this.mouse = {x: this.target.position.x, y: this.target.position.y};
-    
-    var massReq = 1.25 * (this.target.mass * 2 ); // Mass required to splitkill the target
-    
-    if ((cell.mass > massReq) && (this.cells.length <= 2)) { // Will not split into more than 4 cells
-        var splitDist = (4 * (40 + (cell.getSpeed() * 4))) + (cell.getSize() * 1.75); // Distance needed to splitkill
-        var distToTarget = this.getAccDist(cell,this.target); // Distance between the target and this cell
-        
-        if (splitDist >= distToTarget) {
-            // Splitkill
-    console.log('[Bot] ' + cell.getName() + " has splitted")
-            this.gameServer.splitCells(this);
+            this.target = this.getRandom(this.prey);
         }
-    }
+        //console.log("[Bot] "+cell.getName()+": Targeting "+this.target.getName());
+                        
+        this.mouse = {x: this.target.position.x, y: this.target.position.y};
+        
+        var massReq = 1.25 * (this.target.mass * 2 ); // Mass required to splitkill the target
+        
+        if ((cell.mass > massReq) && (this.cells.length <= 2)) { // Will not split into more than 4 cells
+            var splitDist = (4 * (40 + (cell.getSpeed() * 4))) + (cell.getSize() * 1.75); // Distance needed to splitkill
+            var distToTarget = this.getAccDist(cell,this.target); // Distance between the target and this cell
+            
+            if (splitDist >= distToTarget) {
+                // Splitkill
+        console.log('[Bot] ' + cell.getName() + " has splitted")
+                this.gameServer.splitCells(this);
+            }
+        }
   }
 
   feed () 
   {
-    if ((!this.target) || (this.target.getType() == 0) || (this.visibleNodes.indexOf(this.target) == -1)) 
-    {
-        // Food is eaten/a player cell/out of sight... so find a new food cell to target
-        this.target = this.findNearest(cell,this.food);
-                    
-        this.mouse = {x: this.target.position.x, y: this.target.position.y};
-    }
+    //
   }
   
   wander () 
   {
-    if ((cell.position.x == this.mouseX) && (cell.position.y == this.mouseY)) 
-    {
-        // Get a new position
-        var index = Math.floor(Math.random() * this.gameServer.nodes.length);
-        var randomNode = this.gameServer.nodes[index];
-        var pos = {x: 0, y: 0};
-    
-        if (randomNode.getType() == 3 | 1) 
-        {
-            pos.x = randomNode.position.x;
-            pos.y = randomNode.position.y;
-        } 
-        else
-        {
-            // Not a food/ejected cell
-            pos = this.gameServer.getRandomPosition();
-        }
-    
-    // Set bot's mouse coords to this location
-    this.mouse = {x: pos.x, y: pos.y};
-}
+    //
   }
   
   aggressiveSplit()
