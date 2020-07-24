@@ -73,7 +73,7 @@ const tree = new Selector(
                     Bot.splitAttack()
                     return SUCCESS
                 }
-                // case 2.2: enemy is 1/2 x < 1 our mass
+                // case 2.2: enemy is 1/2 < x < 1 our mass
                 else
                 { */
                     Bot.chase()
