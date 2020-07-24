@@ -10,7 +10,7 @@ serverPlaceholder = Nick
 serverPort = 80
 serverGamemode = 0
 serverOldColors = 0
-serverBots = 20
+serverBots = 3
 serverViewBase = 1024
 leaderboardUpdateClient = 40
 // [Border]
