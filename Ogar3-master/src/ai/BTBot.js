@@ -1,7 +1,5 @@
 var PlayerTracker = require('../PlayerTracker');
 
-const { BehaviorTree, Sequence, Selector, Task, SUCCESS, FAILURE } = require('behaviortree')
-
 function BTBot() {
 	PlayerTracker.apply(this, Array.prototype.slice.call(arguments));
 	//this.color = gameServer.getRandomColor();
@@ -40,23 +38,14 @@ BTBot.prototype.getLowestCell = function() {
 // Override
 
 BTBot.prototype.updateSightRange = function() { // For view distance
-    var totalSize = 1.0;
-    var len = this.cells.length;
-    
-    for (var i = 0; i < len;i++) {
-    	
-        if (!this.cells[i]) {
-            continue;
-        }
-    	
-        totalSize += this.cells[i].getSize();
-    }
-    this.sightRange = 1024 / Math.pow(Math.min(64.0 / totalSize, 1), 0.4);
+    var range = 1000;
+    range += this.cells[0].getSize() * 2.5;
+	
+    this.sightRange = range;
 }
 
 BTBot.prototype.update = function() { // Overrides the update function from player tracker
     // Remove nodes from visible nodes if possible
-    
     for (var i = 0; i < this.nodeDestroyQueue.length; i++) {
         var index = this.visibleNodes.indexOf(this.nodeDestroyQueue[i]);
         if (index > -1) {
@@ -121,64 +110,13 @@ BTBot.prototype.update = function() { // Overrides the update function from play
             }
         }
     }
-
     // Action
     this.decide(cell);
 	
     this.nodeDestroyQueue = []; // Empty
-    
 }
 
-// class
-class Dog{
-    bark(){
-        console.log("Bark!")
-    }
-    randomlyWalk(){
-        console.log("Random Walk!")
-    }
-    standBesideATree(){
-        console.log("Stand!")
-    }
-    liftALeg(){
-        console.log("Lift!")
-    }
-    pee(){
-        console.log("Pee!")
-    }
-}
-
-// Behavior Tree
-BehaviorTree.register('bark', new Task({
-    run: function(dog) {
-      dog.bark()
-      return SUCCESS
-    }
-  }))
-   
-  const tree = new Sequence({
-    nodes: [
-      'bark',
-      new Task({
-        run: function(dog) {
-          dog.randomlyWalk()
-          return SUCCESS
-        }
-      }),
-      'bark',
-      new Task({
-        run: function(dog) {
-          if (dog.standBesideATree()) {
-            dog.liftALeg()
-            dog.pee()
-            return SUCCESS
-          } else {
-            return FAILURE
-          }
-        }
-      })
-    ]
-  })
+// Custom
 
 BTBot.prototype.decide = function(cell) {
 	// Check for predators
@@ -193,27 +131,99 @@ BTBot.prototype.decide = function(cell) {
 	} else {
 		// Run
 		this.gameState = 2;
+	}
+	// console.log("Gamestate of BTBot is " + this.gameState);
+    switch (this.gameState) {
+        case 0: // Wander
+            //console.log("[Bot] "+cell.getName()+": Wandering");
+            if ((cell.position.x == this.mouseX) && (cell.position.y == this.mouseY)) {
+                // Get a new position
+                var index = Math.floor(Math.random() * this.gameServer.nodes.length);
+                var randomNode = this.gameServer.nodes[index];
+                var pos = {x: 0, y: 0};
+		        
+                if (randomNode.getType() == 3 | 1) {
+                    pos.x = randomNode.position.x;
+                    pos.y = randomNode.position.y;
+                } else {
+                    // Not a food/ejected cell
+                    pos = this.gameServer.getRandomPosition();
+                }
+		        
+                // Set bot's mouse coords to this location
+                this.mouse = {x: pos.x, y: pos.y};
+            }
+            break;
+        case 1: // Looking for food
+            //console.log("[Bot] "+cell.getName()+": Getting Food");
+            if ((!this.target) || (this.target.getType() == 0) || (this.visibleNodes.indexOf(this.target) == -1)) {
+                // Food is eaten/a player cell/out of sight... so find a new food cell to target
+                this.target = this.findNearest(cell,this.food);
+							
+                this.mouse = {x: this.target.position.x, y: this.target.position.y};
+            }
+            break;
+        case 2: // Run from (potential) predators
+            var avoid = this.predators[0];
+            //console.log("[Bot] "+cell.getName()+": Fleeing from "+avoid.getName());
+	    	
+            // Find angle of vector between cell and predator
+            var deltaY = avoid.position.y - cell.position.y;
+            var deltaX = avoid.position.x - cell.position.x;
+            var angle = Math.atan2(deltaX,deltaY);
+            
+            // Now reverse the angle
+            if (angle > Math.PI) {
+                angle -= Math.PI;
+            } else {
+                angle += Math.PI;
+            }
+	    	
+            // Direction to move
+            var x1 = cell.position.x + (500 * Math.sin(angle));
+            var y1 = cell.position.y + (500 * Math.cos(angle));
+			
+            if ((!this.target) || (this.target.getType() == 0) || (this.visibleNodes.indexOf(this.target) == -1)) {
+                var foods = this.getFoodBox(x1,y1);
+                if (foods) {
+                    this.target = this.findNearest(cell, this.food);
+				
+                    this.mouseX = this.target.position.x;
+                    this.mouseY = this.target.position.y;
+                    break;
+                }
+            }   
+			
+            this.mouse = {x: x1, y: y1};
+            break;
+        case 3: // Target prey
+            if ((!this.target) || (this.visibleNodes.indexOf(this.target) == -1)) {
+                this.target = this.getRandom(this.prey);
+            }
+            //console.log("[Bot] "+cell.getName()+": Targeting "+this.target.getName());
+							
+            this.mouse = {x: this.target.position.x, y: this.target.position.y};
+			
+            var massReq = 1.25 * (this.target.mass * 2 ); // Mass required to splitkill the target
+			
+            if ((cell.mass > massReq) && (this.cells.length <= 2)) { // Will not split into more than 4 cells
+                var splitDist = (4 * (40 + (cell.getSpeed() * 4))) + (cell.getSize() * 1.75); // Distance needed to splitkill
+                var distToTarget = this.getAccDist(cell,this.target); // Distance between the target and this cell
+				
+                if (splitDist >= distToTarget) {
+                    // Splitkill
+			console.log('[Bot] ' + cell.getName() + " has splitted")
+                    this.gameServer.splitCells(this);
+                }
+            }
+            break;
+		default:
+            //console.log("[Bot] "+cell.getName()+": Idle "+this.gameState);
+            this.gameState = 0;
+            break;
     }
-
-    //const intitalbot = new BehaviorBot()
-    //const behavior_bot = Object.assign(cell, intitalbot)
-
-    const dog = new Dog(/*...*/) // the nasty details of a dog are omitted
- 
-    const bTree = new BehaviorTree({
-    tree: tree,
-    blackboard: dog
-    })
- 
-    // The "game" loop:
-    setInterval(function() {
-    console.log("_____________________________________________")
-    bTree.step({ debug: true })
-    console.log(bTree.lastRunData)
-    console.log("_____________________________________________")
-    }, 1000/60)
-
 }
+
 // Finds the nearest cell in list
 BTBot.prototype.findNearest = function(cell,list) {
 	if (this.currentTarget) {
@@ -294,5 +304,4 @@ BTBot.prototype.getFoodBox = function(x,y) {
           
 		list.push(check);
     }
-}   
-// Custom
+}

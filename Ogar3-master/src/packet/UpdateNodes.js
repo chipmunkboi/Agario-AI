@@ -27,7 +27,6 @@ UpdateNodes.prototype.build = function() {
     view.setUint16(1, this.destroyQueue.length, true); // Nodes to be destroyed
 
     var offset = 3;
-
     for (var i = 0; i < this.destroyQueue.length; i++) {
         var node = this.destroyQueue[i];
 
@@ -45,7 +44,7 @@ UpdateNodes.prototype.build = function() {
         
         offset += 8;
     }
- 
+    
     for (var i = 0; i < this.nodes.length; i++) {
         var node = this.nodes[i];
 
